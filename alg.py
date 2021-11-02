@@ -10,16 +10,22 @@ import matplotlib.pyplot as plt
 
 
 def detect():
-    img = cv2.imread('a3.jpg')
+    return detectFrom('a3.jpg')
+
+
+def detectFrom(img):
+    img = cv2.imdecode(np.frombuffer(img, np.uint8), -1)
+    # img = np.ndarray(img)
+    # img = cv2.imread(img)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img = cv2.flip(img,1)
+    #img = cv2.flip(img,1)
     img = 255 - img
 
     # create a zero array
     stencil = np.zeros_like(img)
 
     # specify coordinates of the polygon
-    polygon = np.array([[0, 260], [0, 700],[1000, 700], [900, 260]])
+    polygon = np.array([[0, 150], [0, 700],[1000, 700], [900, 150]])
 
     # fill polygon with ones
     cv2.fillConvexPoly(stencil, polygon, 1)
@@ -30,16 +36,16 @@ def detect():
 
 
     # plot masked frame
-    plt.figure(figsize=(10, 10))
-    plt.imshow(img, cmap="gray")
-    plt.show()
+    # plt.figure(figsize=(10, 10))
+    # plt.imshow(img, cmap="gray")
+    # plt.show()
     # apply image thresholding
     ret, thresh = cv2.threshold(img, 145, 255, cv2.THRESH_BINARY)
 
     # plot image
-    plt.figure(figsize=(10,10))
-    plt.imshow(thresh, cmap= "gray")
-    plt.show()
+    # plt.figure(figsize=(10,10))
+    # plt.imshow(thresh, cmap= "gray")
+    # plt.show()
 
     lines = cv2.HoughLinesP(thresh, 145, np.pi / 180, 200,minLineLength=300, maxLineGap=400)
 
@@ -48,19 +54,33 @@ def detect():
 
     sumSlopes = 0
     # draw Hough lines
+    if lines is None:
+        return 1, dmy, 320
+    ymax = 600
+    xmax = 0
     for line in lines:
         x1, y1, x2, y2 = line[0]
+        if y1 < ymax:
+            ymax = y1
+            xmax = x1
+        if y2 < ymax:
+            ymax = y2
+            xmax = x2
         if x2 == x1:
             continue
         slope = (y2-y1)/(x2-x1)
         sumSlopes += slope
         cv2.line(dmy, (x1, y1), (x2, y2), (255, 0, 0), 3)
-    print(sumSlopes/len(lines))
+    print(ymax)
+    print(xmax)
+    res = sumSlopes/len(lines)
+    print(res)
+    return res, dmy, xmax
 
     # plot frame
-    plt.figure(figsize=(10, 10))
-    plt.imshow(dmy, cmap="gray")
-    plt.show()
+    # plt.figure(figsize=(10, 10))
+    # plt.imshow(dmy, cmap="gray")
+    # plt.show()
 
 
 # Press the green button in the gutter to run the script.

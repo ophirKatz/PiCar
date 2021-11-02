@@ -1,14 +1,18 @@
 import sys, time, http.client
 from urllib.request import urlopen
+
+import matplotlib.pyplot as plt
 import requests
 
 from random import randrange
+from alg import detectFrom
 
 from PIL import Image
 import io
 
 # Set speed content, and speed level content
 MAX_SPEED = 100
+LOW_SPEED = 25
 MIN_SPEED = 40
 SPEED_LEVEL_1 = MIN_SPEED
 SPEED_LEVEL_2 = (MAX_SPEED - MIN_SPEED) / 4 * 1 + MIN_SPEED
@@ -78,23 +82,43 @@ def alg(data):
         return 'fwleft'
     return 'fwright'
 
-
 # Press the green button in the gutter to run the script.
 if __name__ == "__main__":
-    run_action('stop')
-    sys.exit()
+    countLeft = 0
+    countRight = 0
+    #run_action('stop')
+    #sys.exit()
     queryImage = QueryImage(HOST)
+    run_action('stop')
     run_action('fwready')
     run_action('bwready')
     run_action('camready')
     run_action('camdown')
-    set_speed_level(str(SPEED_LEVEL_1))
+    set_speed_level(str(LOW_SPEED))
     run_action('forward')
     while True:
         img = queryImage.queryImage()
         # Move to alg
-        res = alg(img)
-        run_action(res)
+        detected = detectFrom(img)
+        if detected is None or detected is int:
+            continue
+        res, dmy, xmax = detected
+        #run_action('stop')
+        #plt.imshow(dmy)
+        #plt.show()
+        #run_action('forward')
+
+        if xmax > 330:
+            run_action('fwright')
+        elif xmax < 310:
+            run_action('fwleft')
+        # if res >= 0 and res < 3:
+        #     countLeft += 1
+        #     run_action('fwleft')
+        # elif res > -3 and res < 0:
+        #     run_action('fwright')
+
+        run_action('fwstraight')
     # run_action('camleft')
 
     # run_action('camdown')
