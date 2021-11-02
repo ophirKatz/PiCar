@@ -2,6 +2,8 @@ import sys, time, http.client
 from urllib.request import urlopen
 import requests
 
+from random import randrange
+
 from PIL import Image
 import io
 
@@ -71,29 +73,42 @@ class QueryImage:
         return returnmsg.read()
 
 
+def alg(data):
+    if randrange(10) > 5:
+        return 'fwleft'
+    return 'fwright'
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == "__main__":
-    # run_action('stop')
-    # sys.exit()
-
+    run_action('stop')
+    sys.exit()
     queryImage = QueryImage(HOST)
     run_action('fwready')
     run_action('bwready')
     run_action('camready')
-    # run_action('camleft')
-
     run_action('camdown')
-    # run_action('stop')
     set_speed_level(str(SPEED_LEVEL_1))
     run_action('forward')
-    for i in range(30):
+    while True:
         img = queryImage.queryImage()
+        # Move to alg
+        res = alg(img)
+        run_action(res)
+    # run_action('camleft')
 
-        image = Image.open(io.BytesIO(img))
-        image.save('lubin'+str(i + 50)+'.jpg')
-        time.sleep(0.2)
+    # run_action('camdown')
+    # # run_action('stop')
+    # set_speed_level(str(SPEED_LEVEL_1))
+    # run_action('forward')
+    # for i in range(30):
+    #     img = queryImage.queryImage()
+    #
+    #     image = Image.open(io.BytesIO(img))
+    #     image.save('lubin'+str(i + 50)+'.jpg')
+    #     time.sleep(0.2)
 
     # set_speed_level(str(SPEED_LEVEL_2))
     # run_action('forward')
     # time.sleep(3)
-    run_action('stop')
+    # run_action('stop')
