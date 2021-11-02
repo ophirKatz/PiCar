@@ -82,6 +82,7 @@ if __name__ == "__main__":
     run_action('camready')
     # run_action('camleft')
 
+    run_action('camdown')
     # run_action('stop')
     set_speed_level(str(SPEED_LEVEL_1))
     run_action('forward')
@@ -89,7 +90,7 @@ if __name__ == "__main__":
         img = queryImage.queryImage()
 
         image = Image.open(io.BytesIO(img))
-        image.save('lubin'+str(i + 34)+'.jpg')
+        image.save('lubin'+str(i + 50)+'.jpg')
         time.sleep(0.2)
 
     # set_speed_level(str(SPEED_LEVEL_2))
