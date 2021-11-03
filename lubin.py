@@ -16,6 +16,7 @@ def thresh_frame_in_HSV(frame, min_values, max_values, verbose=False):
     """
     Threshold a color frame in HSV space
     """
+    print(frame.shape)
     HSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     min_th_ok = np.all(HSV > min_values, axis=2)

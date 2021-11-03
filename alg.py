@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 from algo2 import detectFromNew
+from lubin import yellow_lines
 
 def detect():
     return detectFrom('a3.jpg')
@@ -59,7 +60,40 @@ def findLines(img):
     return lines, img
 
 
+def get_dir_counts(lines):
+    leftcount, rightcount = 0, 0
+    rightPoints, leftPoints = [], []
+    if lines is None or len(lines) < 5:
+        return 0, 0, [], []
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        if 330 < x1:
+            rightcount += 1
+            rightPoints.append((x1, y1))
+        elif x1 < 310:
+            leftcount += 1
+            leftPoints.append((x1, y1))
+        if 330 < x2:
+            rightcount += 1
+            rightPoints.append((x2, y2))
+        elif x2 < 310:
+            leftcount += 1
+            leftPoints.append((x2, y2))
+        if x2 == x1:
+            continue
+    return leftcount, rightcount, leftPoints, rightPoints
+
+
+def detectYellow(img):
+    img = cv2.imdecode(np.frombuffer(img, np.uint8), cv2.IMREAD_COLOR)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    yellow = yellow_lines(img)
+    leftcount, rightcount, e, r = get_dir_counts(yellow)
+    return rightcount, leftcount
+
+
 def detectFrom(img):
+    orig = img
     lines, img = detectFromNew(img)
 
     # create a copy of the original frame
@@ -67,45 +101,48 @@ def detectFrom(img):
 
     sumSlopes = 0
     # draw Hough lines
-    if lines is None:
-        return 500, dmy, 320, 0, 0
-    ymin = 600
-    xmin = 0
-    leftcount, rightcount = 0, 0
-    numSlopes = 0
-    for line in lines:
-        x1, y1, x2, y2 = line[0]
-        if y1 < ymin:
-            ymin = y1
-            xmin = x1
-        if y2 < ymin:
-            ymin = y2
-            xmin = x2
-        if x1 > 340:
-            rightcount += 1
-        else:
-            leftcount += 1
-        if x2 > 340:
-            rightcount += 1
-        else:
-            leftcount += 1
-        if x2 == x1:
-            continue
-        slope = (y2-y1)/(x2-x1)
-        slopeabs = abs(slope)
-        # plt.imshow(dmy)
-        # plt.show()
-        if 0.5 < slopeabs < 2 or True:
-            sumSlopes += slope
-            numSlopes += 1
-        cv2.line(dmy, (x1, y1), (x2, y2), (255, 0, 0), 3)
+    if lines is None or len(lines) < 3:
+        # return detectYellow(orig)
+        # return 500, dmy, 320, 0, 0
+        return 0, 0, [], []
+    leftcount, rightcount, leftPoints, rightPoints = get_dir_counts(lines)
+    # ymin = 600
+    # xmin = 0
+    # leftcount, rightcount = 0, 0
+    # numSlopes = 0
+    # for line in lines:
+    #     x1, y1, x2, y2 = line[0]
+    #     if y1 < ymin:
+    #         ymin = y1
+    #         xmin = x1
+    #     if y2 < ymin:
+    #         ymin = y2
+    #         xmin = x2
+    #     if x1 > 340:
+    #         rightcount += 1
+    #     else:
+    #         leftcount += 1
+    #     if x2 > 340:
+    #         rightcount += 1
+    #     else:
+    #         leftcount += 1
+    #     if x2 == x1:
+    #         continue
+    #     slope = (y2-y1)/(x2-x1)
+    #     slopeabs = abs(slope)
+    #     # plt.imshow(dmy)
+    #     # plt.show()
+    #     if 0.5 < slopeabs < 2 or True:
+    #         sumSlopes += slope
+    #         numSlopes += 1
+    #     cv2.line(dmy, (x1, y1), (x2, y2), (255, 0, 0), 3)
     # print(ymin)
     # print(xmin)
-    if numSlopes == 0:
-        return 500, dmy, xmin, leftcount, rightcount
-    slopeAvg = sumSlopes/numSlopes
-    print(slopeAvg)
-    return slopeAvg, dmy, xmin, leftcount, rightcount
+    # if numSlopes == 0:
+    #     return 500, dmy, xmin, leftcount, rightcount
+    # slopeAvg = sumSlopes/numSlopes
+    # print(slopeAvg)
+    return leftcount, rightcount, leftPoints, rightPoints
 
     # plot frame
     # plt.figure(figsize=(10, 10))

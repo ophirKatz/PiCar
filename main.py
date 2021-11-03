@@ -1,9 +1,10 @@
+import math
 import sys, time, http.client
 from urllib.request import urlopen
 
 import matplotlib.pyplot as plt
 import requests
-
+from math import atan
 from random import randrange
 
 import algo2
@@ -14,7 +15,7 @@ import io
 
 # Set speed content, and speed level content
 MAX_SPEED = 100
-LOW_SPEED = 25
+LOW_SPEED = 30
 MIN_SPEED = 40
 SPEED_LEVEL_1 = MIN_SPEED
 SPEED_LEVEL_2 = (MAX_SPEED - MIN_SPEED) / 4 * 1 + MIN_SPEED
@@ -23,7 +24,7 @@ SPEED_LEVEL_4 = (MAX_SPEED - MIN_SPEED) / 4 * 3 + MIN_SPEED
 SPEED_LEVEL_5 = MAX_SPEED
 SPEED = [0, SPEED_LEVEL_1, SPEED_LEVEL_2, SPEED_LEVEL_3, SPEED_LEVEL_4, SPEED_LEVEL_5]
 
-HOST = '192.168.2.104'
+HOST = '192.168.2.106'
 PORT = '8000'
 
 # BASE_URL is variant use to save the format of host and port
@@ -93,6 +94,25 @@ def turnright():
     run_action('fwturn:110')
 
 
+def mid_point(points):
+    xSum, ySum = 0, 0
+    l = len(points)
+    for p in points:
+        xSum += p[0]
+        ySum += p[1]
+    return xSum / l, ySum / l
+
+
+mid_low_point = (320, 480)
+
+
+def get_mid_angle(point):
+    dx = point[0]-mid_low_point[0]
+    dy = point[1]-mid_low_point[1]
+    angle = math.degrees(atan(abs(dx) / abs(dy)))
+    return angle
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == "__main__":
     countLeft = 0
@@ -108,40 +128,66 @@ if __name__ == "__main__":
     set_speed_level(str(LOW_SPEED))
     run_action('forward')
     last = 'fwstraight'
+    countNoLines = 0
     while True:
         img = queryImage.queryImage()
+
         # Move to alg
         detected = detectFrom(img)
         # detected = algo2.detectFromNew(img)
-        if detected is None or detected is int:
-            continue
-        slope, dmy, xmax, leftcount, rightcount = detected
-
-        # run_action('stop')
-        # plt.imshow(dmy)
-        # plt.show()
-        # run_action('forward')
-
-        #run_action('stop')
-        #plt.imshow(dmy)
-        #plt.show()
-        #run_action('forward')
+        """if detected is None or detected is int:
+            continue"""
+        leftcount, rightcount, leftPoints, rightPoints = detected
+        # slope, dmy, xmax, leftcount, rightcount = detected
 
         print(leftcount)
         print(rightcount)
         if leftcount == rightcount == 0:
-            if last == 'fwleft':
-                last = 'fwright'
-                turnright()
-            else:
-                last = 'fwleft'
-                turnleft()
+            print('no lines')
+            # run_action(last)
+            # countNoLines += 1
+            # if countNoLines >= 2:
+            #     countNoLines = 0
+            #     if last == 'fwleft':
+            #         last = 'fwright'
+            #         run_action('fwturn:135')
+            #         # turnright()
+            #     else:
+            #         last = 'fwleft'
+            #         run_action('fwturn:45')
+            #         # turnleft()
+            # run_action('fwstraight')
+            continue
+            # run_action(last)
+            # if last == 'fwleft':
+            #     last = 'fwright'
+            #     turnright()
+            # else:
+            #     last = 'fwleft'
+            #     turnleft()
         if leftcount > rightcount:
+            # mid = mid_point(leftPoints)
+            # angle = get_mid_angle(mid)
+            # angle = 90-angle
+            # # run_action('stop')
+            # aturn = 'fwturn:' + str(int(max(angle, 70)))
+            # print(aturn)
+            # run_action(aturn)
+            # run_action('forward')
             turnleft()
-            last = 'fwleft'
+            # last = aturn
         else:
+            # mid = mid_point(rightPoints)
+            # angle = get_mid_angle(mid)
+            # angle = 90 + angle
+            # # run_action('stop')
+            # aturn ='fwturn:' + str(int(min(angle + 90, 110)))
+            # print(aturn)
+            # run_action(aturn)
+            # run_action('forward')
             turnright()
-            last = 'fwright'
+            # last = aturn
+        # run_action('fwstraight')
         # print(xmax)
         # if xmax > 330:
         #    run_action('fwright')

@@ -1,16 +1,9 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 from __future__ import print_function
 import cv2 as cv
 import argparse
 
 import numpy as np
-
-from Line import Line
-import lane_detection
 
 max_lowThreshold = 100
 window_name = 'Edge Map'
