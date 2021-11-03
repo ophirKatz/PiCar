@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import requests
 
 from random import randrange
+
+import algo2
 from alg import detectFrom
 
 from PIL import Image
@@ -21,7 +23,7 @@ SPEED_LEVEL_4 = (MAX_SPEED - MIN_SPEED) / 4 * 3 + MIN_SPEED
 SPEED_LEVEL_5 = MAX_SPEED
 SPEED = [0, SPEED_LEVEL_1, SPEED_LEVEL_2, SPEED_LEVEL_3, SPEED_LEVEL_4, SPEED_LEVEL_5]
 
-HOST = '192.168.2.116'
+HOST = '192.168.2.104'
 PORT = '8000'
 
 # BASE_URL is variant use to save the format of host and port
@@ -82,6 +84,15 @@ def alg(data):
         return 'fwleft'
     return 'fwright'
 
+
+def turnleft():
+    run_action('fwturn:70')
+
+
+def turnright():
+    run_action('fwturn:110')
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == "__main__":
     countLeft = 0
@@ -96,29 +107,54 @@ if __name__ == "__main__":
     run_action('camdown')
     set_speed_level(str(LOW_SPEED))
     run_action('forward')
+    last = 'fwstraight'
     while True:
         img = queryImage.queryImage()
         # Move to alg
         detected = detectFrom(img)
+        # detected = algo2.detectFromNew(img)
         if detected is None or detected is int:
             continue
-        res, dmy, xmax = detected
+        slope, dmy, xmax, leftcount, rightcount = detected
+
+        # run_action('stop')
+        # plt.imshow(dmy)
+        # plt.show()
+        # run_action('forward')
+
         #run_action('stop')
         #plt.imshow(dmy)
         #plt.show()
         #run_action('forward')
 
-        if xmax > 330:
-            run_action('fwright')
-        elif xmax < 310:
-            run_action('fwleft')
-        # if res >= 0 and res < 3:
+        print(leftcount)
+        print(rightcount)
+        if leftcount == rightcount == 0:
+            if last == 'fwleft':
+                last = 'fwright'
+                turnright()
+            else:
+                last = 'fwleft'
+                turnleft()
+        if leftcount > rightcount:
+            turnleft()
+            last = 'fwleft'
+        else:
+            turnright()
+            last = 'fwright'
+        # print(xmax)
+        # if xmax > 330:
+        #    run_action('fwright')
+        # elif xmax < 310:
+        #    run_action('fwleft')
+        # if 0 <= slope < 10:
         #     countLeft += 1
         #     run_action('fwleft')
-        # elif res > -3 and res < 0:
+        # elif -10 < slope < 0:
         #     run_action('fwright')
 
-        run_action('fwstraight')
+        # time.sleep(0.1)
+        # run_action('fwstraight')
     # run_action('camleft')
 
     # run_action('camdown')
