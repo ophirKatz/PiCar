@@ -67,16 +67,16 @@ def get_dir_counts(lines):
         return 0, 0, [], []
     for line in lines:
         x1, y1, x2, y2 = line[0]
-        if 330 < x1:
+        if 320 <= x1:
             rightcount += 1
             rightPoints.append((x1, y1))
-        elif x1 < 310:
+        elif x1 < 320:
             leftcount += 1
             leftPoints.append((x1, y1))
-        if 330 < x2:
+        if 320 <= x2:
             rightcount += 1
             rightPoints.append((x2, y2))
-        elif x2 < 310:
+        elif x2 < 320:
             leftcount += 1
             leftPoints.append((x2, y2))
         if x2 == x1:
@@ -104,7 +104,7 @@ def detectFrom(img):
     if lines is None or len(lines) < 3:
         # return detectYellow(orig)
         # return 500, dmy, 320, 0, 0
-        return 0, 0, [], []
+        return 0, 0, [], [], None
     leftcount, rightcount, leftPoints, rightPoints = get_dir_counts(lines)
     # ymin = 600
     # xmin = 0
@@ -142,7 +142,7 @@ def detectFrom(img):
     #     return 500, dmy, xmin, leftcount, rightcount
     # slopeAvg = sumSlopes/numSlopes
     # print(slopeAvg)
-    return leftcount, rightcount, leftPoints, rightPoints
+    return leftcount, rightcount, leftPoints, rightPoints, img
 
     # plot frame
     # plt.figure(figsize=(10, 10))
