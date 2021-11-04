@@ -16,8 +16,8 @@ import io
 
 # Set speed content, and speed level content
 MAX_SPEED = 100
-REV_SPEED = 20
-LOW_SPEED = 25
+REV_SPEED = 30
+LOW_SPEED = 30
 MIN_SPEED = 40
 SPEED_LEVEL_1 = MIN_SPEED
 SPEED_LEVEL_2 = (MAX_SPEED - MIN_SPEED) / 4 * 1 + MIN_SPEED
