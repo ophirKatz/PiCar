@@ -17,7 +17,7 @@ import io
 # Set speed content, and speed level content
 MAX_SPEED = 100
 REV_SPEED = 20
-LOW_SPEED = 30
+LOW_SPEED = 25
 MIN_SPEED = 40
 SPEED_LEVEL_1 = MIN_SPEED
 SPEED_LEVEL_2 = (MAX_SPEED - MIN_SPEED) / 4 * 1 + MIN_SPEED
@@ -122,7 +122,7 @@ def ready():
     run_action('fwready')
     run_action('bwready')
     run_action('camready')
-    run_action('camdown')
+    run_action('camup')
     set_speed_level(str(LOW_SPEED))
     run_action('forward')
 
@@ -153,6 +153,7 @@ if __name__ == "__main__":
             action = 'fwstraight'
             if 'fwturn' in last:
                 action = 'fwturn:' + str(180-int(last.split(':')[1]))
+            # action = 'fwstraight'
             last = action
             run_action(action)
             # if last == 'fwleft':
@@ -163,10 +164,11 @@ if __name__ == "__main__":
             #     # last = 'fwleft'
             #     run_action('fwturn:70')
             #     # turnleft()
+            # set_speed_level(str(REV_SPEED))
             run_action('backward')
             if countNoLines >= 3:
                 countNoLines = 0
-                run_action('forward')
+                # run_action('forward')
             # run_action(last)
             # countNoLines += 1
             # if countNoLines >= 2:
@@ -181,6 +183,7 @@ if __name__ == "__main__":
             #         # turnleft()
             # run_action('fwstraight')
             continue
+        set_speed_level(str(LOW_SPEED))
         if leftcount > rightcount:
             mid = mid_point(leftPoints)
             x, y = mid
@@ -194,10 +197,10 @@ if __name__ == "__main__":
             last = aturn
             if img is not None:
                 cv2.line(img, (x, 0), mid_low_point, (255, 255, 255), 3)
-                run_action('stop')
-                plt.imshow(img)
-                plt.show()
-                run_action('forward')
+                # run_action('stop')
+                # plt.imshow(img)
+                # plt.show()
+                # run_action('forward')
             # run_action('forward')
             # turnleft()
             # last = aturn
@@ -214,10 +217,10 @@ if __name__ == "__main__":
             last = aturn
             if img is not None:
                 cv2.line(img, (x, 0), mid_low_point, (255, 255, 255), 3)
-                run_action('stop')
-                plt.imshow(img)
-                plt.show()
-                run_action('forward')
+                # run_action('stop')
+                # plt.imshow(img)
+                # plt.show()
+                # run_action('forward')
             # run_action('forward')
             # turnright()
             # last = aturn

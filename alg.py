@@ -60,6 +60,22 @@ def findLines(img):
     return lines, img
 
 
+def istopleft(x, y):
+    return x < 320 and y < 240
+
+
+def istopright(x, y):
+    return x > 320 and y < 240
+
+
+def isbottomleft(x, y):
+    return x < 320 and y > 240
+
+
+def isbottomright(x, y):
+    return x > 320 and y > 240
+
+
 def get_dir_counts(lines):
     leftcount, rightcount = 0, 0
     rightPoints, leftPoints = [], []
@@ -67,18 +83,45 @@ def get_dir_counts(lines):
         return 0, 0, [], []
     for line in lines:
         x1, y1, x2, y2 = line[0]
-        if 320 <= x1:
-            rightcount += 1
+        if istopleft(x1, y1):
+            leftcount += 4
+            leftPoints.append((x1, y1))
+        if istopright(x1, y1):
+            rightcount += 4
             rightPoints.append((x1, y1))
-        elif x1 < 320:
+
+        if isbottomleft(x1, y1):
             leftcount += 1
             leftPoints.append((x1, y1))
-        if 320 <= x2:
+        if isbottomright(x1, y1):
             rightcount += 1
+            rightPoints.append((x1, y1))
+
+        if istopleft(x2, y2):
+            leftcount += 4
+            leftPoints.append((x2, y2))
+        if istopright(x2, y2):
+            rightcount += 4
             rightPoints.append((x2, y2))
-        elif x2 < 320:
+
+        if isbottomleft(x2, y2):
             leftcount += 1
             leftPoints.append((x2, y2))
+        if isbottomright(x2, y2):
+            rightcount += 1
+            rightPoints.append((x2, y2))
+        # if 320 <= x1:
+        #     rightcount += 1
+        #     rightPoints.append((x1, y1))
+        # elif x1 < 320:
+        #     leftcount += 1
+        #     leftPoints.append((x1, y1))
+        # if 320 <= x2:
+        #     rightcount += 1
+        #     rightPoints.append((x2, y2))
+        # elif x2 < 320:
+        #     leftcount += 1
+        #     leftPoints.append((x2, y2))
         if x2 == x1:
             continue
     return leftcount, rightcount, leftPoints, rightPoints

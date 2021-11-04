@@ -2,7 +2,7 @@ import cv2 as cv
 import cv2.cv2
 import numpy as np
 
-ratio = 5
+ratio = 6
 kernel_size = 3
 window_name = 'Edge Map'
 
@@ -14,7 +14,7 @@ def detectFromNew(img):
     low_threshold = 100
     detected_edges = cv.Canny(img_blur, low_threshold, low_threshold * ratio, kernel_size)
 
-    detected_edges = detected_edges[240:480, 0:640]
+    detected_edges = detected_edges[0:480, 0:640]
 
     lines = cv.HoughLinesP(detected_edges, 2, np.pi / 180, 1, 15, 5)
 
