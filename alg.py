@@ -101,7 +101,7 @@ def detectFrom(img):
 
     sumSlopes = 0
     # draw Hough lines
-    if lines is None or len(lines) < 3:
+    if lines is None or len(lines) < 2:
         # return detectYellow(orig)
         # return 500, dmy, 320, 0, 0
         return 0, 0, [], [], None

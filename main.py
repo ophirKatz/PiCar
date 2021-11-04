@@ -1,7 +1,8 @@
 import math
 import sys, time, http.client
 from urllib.request import urlopen
-
+import cv2 as cv
+import cv2.cv2
 import matplotlib.pyplot as plt
 import requests
 from math import atan
@@ -15,7 +16,8 @@ import io
 
 # Set speed content, and speed level content
 MAX_SPEED = 100
-LOW_SPEED = 25
+REV_SPEED = 20
+LOW_SPEED = 30
 MIN_SPEED = 40
 SPEED_LEVEL_1 = MIN_SPEED
 SPEED_LEVEL_2 = (MAX_SPEED - MIN_SPEED) / 4 * 1 + MIN_SPEED
@@ -100,18 +102,29 @@ def mid_point(points):
     for p in points:
         xSum += p[0]
         ySum += p[1]
-    return xSum / l, ySum / l
+    return int(xSum / l), int(ySum / l)
 
 
-mid_low_point = (320, 240)
+mid_low_point = (320, 480)
 
 
 def get_mid_angle(point):
     dx = point[0]-mid_low_point[0]
-    dy = point[1]-mid_low_point[1]
+    # dy = point[1]-mid_low_point[1]
+    dy = 0-mid_low_point[1]
     angle = math.degrees(atan(abs(dx) / abs(dy)))
     print('computed angle: ' + str(int(angle)))
     return angle
+
+
+def ready():
+    run_action('stop')
+    run_action('fwready')
+    run_action('bwready')
+    run_action('camready')
+    run_action('camdown')
+    set_speed_level(str(LOW_SPEED))
+    run_action('forward')
 
 
 # Press the green button in the gutter to run the script.
@@ -121,13 +134,7 @@ if __name__ == "__main__":
     #run_action('stop')
     #sys.exit()
     queryImage = QueryImage(HOST)
-    run_action('stop')
-    run_action('fwready')
-    run_action('bwready')
-    run_action('camready')
-    run_action('camdown')
-    set_speed_level(str(LOW_SPEED))
-    run_action('forward')
+    ready()
     last = 'fwstraight'
     countNoLines = 0
     while True:
@@ -139,16 +146,13 @@ if __name__ == "__main__":
         """if detected is None or detected is int:
             continue"""
         leftcount, rightcount, leftPoints, rightPoints, img = detected
-        if img is not None:
-            # run_action('stop')
-            plt.imshow(img)
-            # plt.show()
-            run_action('forward')
-            print('lubin')
         # slope, dmy, xmax, leftcount, rightcount = detected
         if leftcount == rightcount == 0:
+            countNoLines += 1
             print('no lines found')
-            action = 'fwturn:' + str(180-int(last.split(':')[1]))
+            action = 'fwstraight'
+            if 'fwturn' in last:
+                action = 'fwturn:' + str(180-int(last.split(':')[1]))
             last = action
             run_action(action)
             # if last == 'fwleft':
@@ -160,6 +164,9 @@ if __name__ == "__main__":
             #     run_action('fwturn:70')
             #     # turnleft()
             run_action('backward')
+            if countNoLines >= 3:
+                countNoLines = 0
+                run_action('forward')
             # run_action(last)
             # countNoLines += 1
             # if countNoLines >= 2:
@@ -174,10 +181,9 @@ if __name__ == "__main__":
             #         # turnleft()
             # run_action('fwstraight')
             continue
-        else:
-            run_action('forward')
         if leftcount > rightcount:
             mid = mid_point(leftPoints)
+            x, y = mid
             angle = get_mid_angle(mid)
             angle = 90 - angle
             # angle = 0.8 * angle
@@ -186,11 +192,18 @@ if __name__ == "__main__":
             print('turn command: ' + aturn)
             run_action(aturn)
             last = aturn
+            if img is not None:
+                cv2.line(img, (x, 0), mid_low_point, (255, 255, 255), 3)
+                run_action('stop')
+                plt.imshow(img)
+                plt.show()
+                run_action('forward')
             # run_action('forward')
             # turnleft()
             # last = aturn
         else:
             mid = mid_point(rightPoints)
+            x, y = mid
             angle = get_mid_angle(mid)
             angle = 90 + angle
             # angle = 0.8 * angle
@@ -199,9 +212,17 @@ if __name__ == "__main__":
             print('turn command: ' + aturn)
             run_action(aturn)
             last = aturn
+            if img is not None:
+                cv2.line(img, (x, 0), mid_low_point, (255, 255, 255), 3)
+                run_action('stop')
+                plt.imshow(img)
+                plt.show()
+                run_action('forward')
             # run_action('forward')
             # turnright()
             # last = aturn
+
+        run_action('forward')
         # run_action('fwstraight')
         # print(xmax)
         # if xmax > 330:

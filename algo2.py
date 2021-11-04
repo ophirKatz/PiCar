@@ -2,7 +2,7 @@ import cv2 as cv
 import cv2.cv2
 import numpy as np
 
-ratio = 7
+ratio = 5
 kernel_size = 3
 window_name = 'Edge Map'
 
